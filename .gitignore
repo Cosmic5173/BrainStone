@@ -41,4 +41,5 @@ build/
 ### Runtime ###
 bases/
 users/
-config.json
+/config.json
+logs/
