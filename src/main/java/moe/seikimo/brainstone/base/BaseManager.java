@@ -32,7 +32,7 @@ public final class BaseManager {
     public static void fini() {
         try {
             for (var base : bases.values())
-                Files.writeString(new File(baseDirectory, base.id().toString()).toPath(), base.toSave());
+                Files.writeString(new File(baseDirectory, base.getId().toString()).toPath(), base.toSave());
         } catch (Exception e) {
             throw new RuntimeException("Failed to save bases.", e);
         }
@@ -43,16 +43,16 @@ public final class BaseManager {
     }
 
     public static void registerBase(Base base) {
-        bases.put(base.id(), base);
+        bases.put(base.getId(), base);
     }
 
     public static void unregisterBase(Base base) {
-        bases.remove(base.id());
+        bases.remove(base.getId());
 
-        if (Files.exists(Path.of(baseDirectory.getPath(), base.id().toString()))) {
-            var baseFile = new File(baseDirectory, base.id().toString());
+        if (Files.exists(Path.of(baseDirectory.getPath(), base.getId().toString()))) {
+            var baseFile = new File(baseDirectory, base.getId().toString());
             if (!baseFile.delete()) {
-                Brain.getLogger().error("ERROR: Unable to delete base file with id: " + base.id());
+                Brain.getLogger().error("ERROR: Unable to delete base file with id: " + base.getId());
             }
         }
     }

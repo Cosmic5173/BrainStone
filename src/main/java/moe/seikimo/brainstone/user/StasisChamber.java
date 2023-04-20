@@ -59,6 +59,12 @@ public record StasisChamber(
                 } else {
                     future.succeeded(true);
                     System.out.println("Successfully activated " + user.getName() + "'s stasis chamber.");
+
+                    // Reset status of redstone block.
+                    var resetRequest = new Request.Builder()
+                            .url(Brain.endpoint(this.key))
+                            .build();
+                    Callback.makeRequest(resetRequest, resetResponse -> {});
                 }
             } catch (Exception ignored) {
                 future.succeeded(false);

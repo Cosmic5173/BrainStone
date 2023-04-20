@@ -29,6 +29,8 @@ public final class Brain {
             = LoggerFactory.getLogger("Brain");
     @Getter private static final LineReader console
             = Brain.createConsole();
+    @Getter private static final Gson gson
+            = new Gson();
     @Getter private static Brain instance;
 
     // Tasks to do immediately on startup.
@@ -132,8 +134,6 @@ public final class Brain {
     @Getter private final Javalin webApp = Javalin.create();
     @Getter private final OkHttpClient httpClient = new OkHttpClient();
 
-    @Getter private final Gson gsonInstance = new Gson();
-
     @Getter private boolean running = true;
     @Getter private final CommandMap commandMap = new CommandMap();
 
@@ -194,9 +194,13 @@ public final class Brain {
     }
 
     private void configureApp() {
+        webApp.get("/user/{userId}/get", BrainRouting::getUser);
         webApp.get("/user/{userId}/stasis/{stasisId}/activate", BrainRouting::activateUserStasisChamber);
         webApp.post("/user/{userId}/stasis/{key}/create", BrainRouting::createUserStasisChamber);
         webApp.delete("/user/{userId}/stasis/{stasisId}/delete", BrainRouting::deleteUserStasisChamber);
+        webApp.get("/base/{baseId}/get", BrainRouting::getBase);
+        webApp.get("/base/{baseId}/doors/{doorId}/open", BrainRouting::openBaseDoor);
+        webApp.get("/base/{baseId}/doors/{doorId}/close", BrainRouting::closeBaseDoor);
     }
 
     private void loadData() {

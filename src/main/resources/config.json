@@ -1,0 +1,5 @@
+{
+  "port": 25564,
+  "webhook-url": "",
+  "wireless-redstone-endpoint": "http://localhost:25564/"
+}

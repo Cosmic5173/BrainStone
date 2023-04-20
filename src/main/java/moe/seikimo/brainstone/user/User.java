@@ -1,6 +1,7 @@
 package moe.seikimo.brainstone.user;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,22 +10,20 @@ import java.util.UUID;
 @Getter public final class User {
     private final UUID id;
     private final String name;
+    @Setter
+    private String baseId;
     private final Map<UUID, StasisChamber> stasisChambers
             = new HashMap<>();
 
     public static User fromSave(String save) {
         var split = save.split(";");
-        var id = UUID.fromString(split[0]);
-        var name = split[1];
-        var user = new User(id, name);
+        var user = new User(UUID.fromString(split[0]), split[1], split[2]);
 
-        if (split.length >= 3 && !split[2].isEmpty()) {
-            var stasisChambers = split[2].split(",");
+        if (split.length >= 4 && !split[3].isEmpty()) {
+            var stasisChambers = split[3].split(",");
             for (var stasisChamber : stasisChambers) {
                 var stasisChamberSplit = stasisChamber.split(":");
-                var stasisId = UUID.fromString(stasisChamberSplit[0]);
-                var stasisKey = UUID.fromString(stasisChamberSplit[1]);
-                user.addStasisChamber(new StasisChamber(user, stasisId, stasisKey));
+                user.addStasisChamber(new StasisChamber(user, UUID.fromString(stasisChamberSplit[0]), UUID.fromString(stasisChamberSplit[1])));
             }
         }
 
@@ -41,12 +40,13 @@ import java.util.UUID;
                     .append(",");
         }
 
-        return String.format("%s;%s;%s", id, name, stasisChambersSave);
+        return String.format("%s;%s;%s;%s", id, name, baseId, stasisChambersSave);
     }
 
-    public User(UUID id, String name) {
+    public User(UUID id, String name, String base) {
         this.id = id;
         this.name = name;
+        this.baseId = base;
     }
 
     public boolean hasStasisChamber(UUID id) {
@@ -71,7 +71,7 @@ import java.util.UUID;
 
     @Override
     public String toString() {
-        return String.format("User{id=%s, name='%s', stasisChambers=%s}",
-                this.id, this.name, this.stasisChambers);
+        return String.format("User{id=%s, name='%s', base=%s, stasisChambers=%s}",
+                this.id, this.name, this.baseId, this.stasisChambers);
     }
 }

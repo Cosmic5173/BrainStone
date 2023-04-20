@@ -1,6 +1,7 @@
 package moe.seikimo.brainstone.command.defaults;
 
 import moe.seikimo.brainstone.Brain;
+import moe.seikimo.brainstone.base.BaseManager;
 import moe.seikimo.brainstone.command.Command;
 import moe.seikimo.brainstone.user.User;
 import moe.seikimo.brainstone.user.UserManager;
@@ -8,7 +9,7 @@ import moe.seikimo.brainstone.user.UserManager;
 import java.util.UUID;
 
 public final class UserCommand extends Command {
-    private static final String USAGE = "Usage: /user <create|delete|list|info>";
+    private static final String USAGE = "Usage: /user <create|delete|list|edit>";
 
     public UserCommand() {
         super("user");
@@ -24,13 +25,12 @@ public final class UserCommand extends Command {
         switch (args[0]) {
             case "create" -> {
                 try {
-                    var name = args[1];
-                    var user = new User(UUID.randomUUID(), name);
+                    var user = new User(UUID.randomUUID(), args[1], args[2]);
                     UserManager.registerUser(user);
 
                     Brain.getLogger().info("Created user: " + user);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    Brain.getLogger().info("Usage: /user create <name>");
+                    Brain.getLogger().info("Usage: /user create <name> <base>");
                 } catch (Exception e) {
                     Brain.getLogger().info("There was an error creating the user. " + e.getMessage());
                     e.printStackTrace();
@@ -60,9 +60,31 @@ public final class UserCommand extends Command {
                     return;
                 }
                 Brain.getLogger().info("Showing " + users.size() + " users:");
-                users.forEach((uuid, user) -> Brain.getLogger().info("" + user));
+                users.forEach((uuid, user) -> Brain.getLogger().info(String.valueOf(user)));
             }
-            case "info" -> Brain.getLogger().info("Showing user info...");
+            case "edit" -> {
+                try {
+                    var userId = UUID.fromString(args[1]);
+                    if (!UserManager.userExists(userId)) {
+                        Brain.getLogger().info("There is no user found with the id: " + userId);
+                    } else {
+                        var user = UserManager.getUser(userId);
+                        var baseId = UUID.fromString(args[2]);
+                        if (!BaseManager.baseExists(baseId)) {
+                            Brain.getLogger().info("There is no base found with the id: " + baseId);
+                        } else {
+                            var base = UserManager.getUser(baseId);
+                            user.setBaseId(args[2]);
+                            Brain.getLogger().info("Updated user: " + user);
+                        }
+                    }
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    Brain.getLogger().info("Usage /user edit <id> <base>");
+                } catch (Exception e) {
+                    Brain.getLogger().info("There was an error editing the user. " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
             default -> Brain.getLogger().info(USAGE);
         }
     }
