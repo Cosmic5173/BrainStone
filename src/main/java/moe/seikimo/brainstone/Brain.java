@@ -168,7 +168,7 @@ public final class Brain {
     private void loadConfiguration() {
         var file = new File("config.json");
         if (!file.exists()) {
-            System.out.println("Config file not found. Exiting.");
+            Brain.logger.error("Config file not found. Exiting.");
             System.exit(1);
         }
 

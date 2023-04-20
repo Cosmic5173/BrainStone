@@ -1,5 +1,6 @@
 package moe.seikimo.brainstone.command.defaults;
 
+import moe.seikimo.brainstone.Brain;
 import moe.seikimo.brainstone.base.Base;
 import moe.seikimo.brainstone.base.BaseManager;
 import moe.seikimo.brainstone.command.Command;
@@ -18,7 +19,7 @@ public final class BaseCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length == 0) {
-            System.out.println(USAGE);
+            Brain.getLogger().info(USAGE);
             return;
         }
 
@@ -29,17 +30,17 @@ public final class BaseCommand extends Command {
                     var description = args[2];
                     var members = new ArrayList<>(Arrays.asList(args).subList(3, args.length));
                     if (members.isEmpty()) {
-                        System.out.println("You must specify at least one member.");
+                        Brain.getLogger().info("You must specify at least one member.");
                         return;
                     }
 
                     var base = new Base(UUID.randomUUID(), new Base.BaseInfo(name, description, members));
                     BaseManager.registerBase(base);
-                    System.out.println("Created base: " + base);
+                    Brain.getLogger().info("Created base: " + base);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: base create <name> <description> <members>");
+                    Brain.getLogger().info("Usage: base create <name> <description> <members>");
                 } catch (Exception e) {
-                    System.out.println("There was an error creating the base. " + e.getMessage());
+                    Brain.getLogger().info("There was an error creating the base. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -47,47 +48,47 @@ public final class BaseCommand extends Command {
                 try {
                     var id = UUID.fromString(args[1]);
                     if (!BaseManager.baseExists(id)) {
-                        System.out.println("There is no base with the id: " + id);
+                        Brain.getLogger().info("There is no base with the id: " + id);
                     } else {
                         var base = BaseManager.getBase(id);
                         BaseManager.unregisterBase(base);
-                        System.out.println("Deleted base: " + base);
+                        Brain.getLogger().info("Deleted base: " + base);
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: base delete <id>");
+                    Brain.getLogger().info("Usage: base delete <id>");
                 } catch (Exception e) {
-                    System.out.println("There was an error deleting the base. " + e.getMessage());
+                    Brain.getLogger().info("There was an error deleting the base. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
-            case "edit" -> System.out.println("Editing base...");
+            case "edit" -> Brain.getLogger().info("Editing base...");
             case "list" -> {
                 var bases = BaseManager.getBases();
                 if (bases.isEmpty()) {
-                    System.out.println("There are no bases to show.");
+                    Brain.getLogger().info("There are no bases to show.");
                     return;
                 }
-                System.out.println("Showing " + bases.size() + " bases:");
-                bases.forEach((uuid, base) -> System.out.println(base));
+                Brain.getLogger().info("Showing " + bases.size() + " bases:");
+                bases.forEach((uuid, base) -> Brain.getLogger().info("" + base));
             }
             case "info" -> {
                 try {
                     var baseId = UUID.fromString(args[1]);
                     var base = BaseManager.getBase(baseId);
                     if (base == null) {
-                        System.out.println("There is no base with the id " + baseId);
+                        Brain.getLogger().info("There is no base with the id " + baseId);
                         return;
                     }
 
-                    System.out.println("Base info: " + base);
+                    Brain.getLogger().info("Base info: " + base);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: base info <baseId>");
+                    Brain.getLogger().info("Usage: base info <baseId>");
                 } catch (Exception e) {
-                    System.out.println("There was an error getting the base info. " + e.getMessage());
+                    Brain.getLogger().info("There was an error getting the base info. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
-            default -> System.out.println(USAGE);
+            default -> Brain.getLogger().info(USAGE);
         }
     }
 }

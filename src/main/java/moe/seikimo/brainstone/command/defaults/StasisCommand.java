@@ -1,5 +1,6 @@
 package moe.seikimo.brainstone.command.defaults;
 
+import moe.seikimo.brainstone.Brain;
 import moe.seikimo.brainstone.command.Command;
 import moe.seikimo.brainstone.user.StasisChamber;
 import moe.seikimo.brainstone.user.UserManager;
@@ -16,13 +17,13 @@ public final class StasisCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length < 2) {
-            System.out.println(USAGE);
+            Brain.getLogger().info(USAGE);
             return;
         }
 
         var userId = UUID.fromString(args[0]);
         if (!UserManager.userExists(userId)) {
-            System.out.println("User does not exist.");
+            Brain.getLogger().info("User does not exist.");
             return;
         }
 
@@ -34,11 +35,11 @@ public final class StasisCommand extends Command {
                     var stasis = new StasisChamber(user, UUID.randomUUID(), key);
                     user.addStasisChamber(stasis);
 
-                    System.out.println("Created stasis: " + stasis + " for user " + user.getName());
+                    Brain.getLogger().info("Created stasis: " + stasis + " for user " + user.getName());
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: /stasis create <key>");
+                    Brain.getLogger().info("Usage: /stasis create <key>");
                 } catch (Exception e) {
-                    System.out.println("There was an error creating the stasis. " + e.getMessage());
+                    Brain.getLogger().info("There was an error creating the stasis. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -46,30 +47,30 @@ public final class StasisCommand extends Command {
                 try {
                     var chamberId = UUID.fromString(args[2]);
                     if (!user.hasStasisChamber(chamberId)) {
-                        System.out.println("User does not have a stasis chamber with id: " + chamberId);
+                        Brain.getLogger().info("User does not have a stasis chamber with id: " + chamberId);
                     } else {
                         var chamber = user.getStasisChamber(chamberId);
                         user.removeStasisChamber(chamber);
-                        System.out.println("Deleted stasis chamber: " + chamber);
+                        Brain.getLogger().info("Deleted stasis chamber: " + chamber);
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: /stasis <user> delete <id>");
+                    Brain.getLogger().info("Usage: /stasis <user> delete <id>");
                 } catch (Exception e) {
-                    System.out.println("There was an error deleting that stasis chamber: " + e.getMessage());
+                    Brain.getLogger().info("There was an error deleting that stasis chamber: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
             case "list" -> {
                 var chambers = user.getStasisChambers();
                 if (chambers.isEmpty()) {
-                    System.out.println("User does not have any stasis chambers.");
+                    Brain.getLogger().info("User does not have any stasis chambers.");
                 } else {
-                    System.out.println("Showing " + chambers.size() + " stasis chambers:");
-                    chambers.forEach((id, chamber) -> System.out.println(chamber));
+                    Brain.getLogger().info("Showing " + chambers.size() + " stasis chambers:");
+                    chambers.forEach((id, chamber) -> Brain.getLogger().info("" + chamber));
                 }
             }
-            case "info" -> System.out.println("Showing stasis info for user " + user.getName() + "...");
-            default -> System.out.println(USAGE);
+            case "info" -> Brain.getLogger().info("Showing stasis info for user " + user.getName() + "...");
+            default -> Brain.getLogger().info(USAGE);
         }
     }
 }

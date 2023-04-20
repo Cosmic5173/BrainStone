@@ -1,5 +1,6 @@
 package moe.seikimo.brainstone.command.defaults;
 
+import moe.seikimo.brainstone.Brain;
 import moe.seikimo.brainstone.command.Command;
 import moe.seikimo.brainstone.user.User;
 import moe.seikimo.brainstone.user.UserManager;
@@ -16,7 +17,7 @@ public final class UserCommand extends Command {
     @Override
     public void execute(String[] args) {
         if (args.length == 0) {
-            System.out.println(USAGE);
+            Brain.getLogger().info(USAGE);
             return;
         }
 
@@ -27,11 +28,11 @@ public final class UserCommand extends Command {
                     var user = new User(UUID.randomUUID(), name);
                     UserManager.registerUser(user);
 
-                    System.out.println("Created user: " + user);
+                    Brain.getLogger().info("Created user: " + user);
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage: /user create <name>");
+                    Brain.getLogger().info("Usage: /user create <name>");
                 } catch (Exception e) {
-                    System.out.println("There was an error creating the user. " + e.getMessage());
+                    Brain.getLogger().info("There was an error creating the user. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -39,30 +40,30 @@ public final class UserCommand extends Command {
                 try {
                     var userId = UUID.fromString(args[1]);
                     if (!UserManager.userExists(userId)) {
-                        System.out.println("There is no user found with the id: " + userId);
+                        Brain.getLogger().info("There is no user found with the id: " + userId);
                     } else {
                         var user = UserManager.getUser(userId);
                         UserManager.unregisterUser(user);
-                        System.out.println("Deleted user: " + user);
+                        Brain.getLogger().info("Deleted user: " + user);
                     }
                 } catch (ArrayIndexOutOfBoundsException e) {
-                    System.out.println("Usage /user delete <id>");
+                    Brain.getLogger().info("Usage /user delete <id>");
                 } catch (Exception e) {
-                    System.out.println("There was an error deleting the user. " + e.getMessage());
+                    Brain.getLogger().info("There was an error deleting the user. " + e.getMessage());
                     e.printStackTrace();
                 }
             }
             case "list" -> {
                 var users = UserManager.getUsers();
                 if (users.isEmpty()) {
-                    System.out.println("There are no users to show.");
+                    Brain.getLogger().info("There are no users to show.");
                     return;
                 }
-                System.out.println("Showing " + users.size() + " users:");
-                users.forEach((uuid, user) -> System.out.println(user));
+                Brain.getLogger().info("Showing " + users.size() + " users:");
+                users.forEach((uuid, user) -> Brain.getLogger().info("" + user));
             }
-            case "info" -> System.out.println("Showing user info...");
-            default -> System.out.println(USAGE);
+            case "info" -> Brain.getLogger().info("Showing user info...");
+            default -> Brain.getLogger().info(USAGE);
         }
     }
 }

@@ -16,8 +16,6 @@ public interface BrainRouting {
      * @param ctx The Javalin request/response context.
      */
     static void activateUserStasisChamber(Context ctx) {
-        System.out.println("Activating stasis chamber...");
-
         var userId = UUID.fromString(ctx.pathParam("userId"));
         var stasisChamberId = UUID.fromString(ctx.pathParam("stasisId"));
         if (!validateUserStasisChamber(userId, stasisChamberId, ctx)) return;

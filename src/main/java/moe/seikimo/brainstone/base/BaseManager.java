@@ -1,5 +1,7 @@
 package moe.seikimo.brainstone.base;
 
+import moe.seikimo.brainstone.Brain;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +52,7 @@ public final class BaseManager {
         if (Files.exists(Path.of(baseDirectory.getPath(), base.id().toString()))) {
             var baseFile = new File(baseDirectory, base.id().toString());
             if (!baseFile.delete()) {
-                System.out.println("ERROR: Unable to delete base file with id: " + base.id());
+                Brain.getLogger().error("ERROR: Unable to delete base file with id: " + base.id());
             }
         }
     }
