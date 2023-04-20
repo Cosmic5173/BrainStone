@@ -1,0 +1,32 @@
+<Configuration>
+    <variable name="LOG_LEVEL" value="${LOG_LEVEL:-INFO}" />
+
+    <appender name="STDOUT" class="moe.seikimo.brainstone.console.JLineConsoleAppender">
+        <encoder>
+            <pattern>[%d{HH:mm:ss}] [%highlight(%level)] [%logger] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/latest.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/log.%d{yyyy-MM-dd}_%d{HH}.log.gz</fileNamePattern>
+            <maxHistory>24</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd' 'HH:mm:ss''}] &lt;%level:%class&gt; %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="io.javalin" level="OFF" />
+    <logger name="org.reflections" level="OFF" />
+    <logger name="org.eclipse.jetty" level="OFF" />
+
+    <logger name="moe.seikimo.brainstone" level="${log.level}" />
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+</Configuration>

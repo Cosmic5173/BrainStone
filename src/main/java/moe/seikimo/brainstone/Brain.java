@@ -1,10 +1,10 @@
 package moe.seikimo.brainstone;
 
+import lombok.SneakyThrows;
 import moe.seikimo.brainstone.api.BrainRouting;
 import moe.seikimo.brainstone.base.BaseManager;
 import moe.seikimo.brainstone.command.CommandMap;
 import moe.seikimo.brainstone.command.defaults.*;
-import moe.seikimo.brainstone.console.TerminalConsole;
 import moe.seikimo.brainstone.user.UserManager;
 import moe.seikimo.brainstone.util.Configuration;
 import com.google.gson.Gson;
@@ -12,14 +12,32 @@ import com.google.gson.GsonBuilder;
 import io.javalin.Javalin;
 import lombok.Getter;
 import okhttp3.OkHttpClient;
+import org.jline.reader.EndOfFileException;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.UUID;
 
 public final class Brain {
-    // Load the configuration on startup.
-    // Create default if not found.
+    @Getter private static final Logger logger
+            = LoggerFactory.getLogger("Brain");
+    @Getter private static final LineReader console
+            = Brain.createConsole();
+    @Getter private static Brain instance;
+
+    // Tasks to do immediately on startup.
     static {
+        // Set logback configuration file.
+        System.setProperty("logback.configurationFile", "logback.xml");
+
+        // Load the configuration on startup.
+        // Create default if not found.
         var configFile = new File("config.json");
         if (!configFile.exists()) {
             try {
@@ -52,23 +70,9 @@ public final class Brain {
         }
     }
 
-    @Getter
-    private static Brain instance;
-
     public static void main(String[] args) {
-        instance = new Brain();
+        Brain.instance = new Brain();
     }
-
-    @Getter private Configuration configuration;
-    @Getter private TerminalConsole console;
-
-    @Getter private final Javalin webApp = Javalin.create();
-    @Getter private final OkHttpClient httpClient = new OkHttpClient();
-
-    @Getter private final Gson gsonInstance = new Gson();
-
-    @Getter private boolean running = true;
-    @Getter private final CommandMap commandMap = new CommandMap();
 
     /**
      * Returns the URL for toggling the endpoint.
@@ -81,23 +85,74 @@ public final class Brain {
                 .getWirelessRedstoneEndpoint() + uuid.toString();
     }
 
+    /**
+     * Creates a {@link LineReader}, or "console" for the application.
+     *
+     * @return A {@link LineReader} instance.
+     * @throws RuntimeException if something impossible happened. (no dumb terminal created)
+     */
+    @SneakyThrows(IOException.class)
+    private static LineReader createConsole() {
+        Terminal terminal;
+        try {
+            terminal = TerminalBuilder.builder().jna(true).build();
+        } catch (IOException ignored) {
+            // Try to get a dumb terminal.
+            terminal = TerminalBuilder.builder().dumb(true).build();
+        }
+
+        return LineReaderBuilder.builder().terminal(terminal).build();
+    }
+
+    /** Sets up the console for input. */
+    private static void setupConsole() {
+        while (true) {
+            try {
+                var line = Brain.console.readLine("> ");
+                if (line == null) continue;
+
+                // Check if the line is empty.
+                if (line.isEmpty()) continue;
+                var content = line.trim(); /* .split(" "); */
+
+                // Handle the line as a command.
+                /* var label = content[0]; */
+                /* var args = new ArrayList<>(Arrays.asList(content).subList(1, content.length)) */
+                Brain.getInstance().getCommandMap().executeRawCommand(content);
+            } catch (UserInterruptException | EndOfFileException ignored) {
+                // Ignore this exception.
+            } catch (IOError | Exception exception) {
+                Brain.logger.error("Unable to process command.", exception);
+            }
+        }
+    }
+
+    @Getter private Configuration configuration;
+
+    @Getter private final Javalin webApp = Javalin.create();
+    @Getter private final OkHttpClient httpClient = new OkHttpClient();
+
+    @Getter private final Gson gsonInstance = new Gson();
+
+    @Getter private boolean running = true;
+    @Getter private final CommandMap commandMap = new CommandMap();
+
     public Brain() {
         this.loadConfiguration();
         this.start();
     }
 
     public void start() {
-        this.console = new TerminalConsole(this);
-        this.console.getThread().start();
-
         this.configureCommands();
 
         this.configureApp();
-        this.webApp.start(configuration.getPort());
+        this.webApp.start(this.configuration.getPort());
 
         this.loadData();
 
-        System.out.println("Done!");
+        Brain.logger.info("Done!");
+        // Configure the console reader.
+        new Thread(Brain::setupConsole).start();
     }
 
     public void stop() {
@@ -106,6 +161,8 @@ public final class Brain {
 
         BaseManager.fini();
         UserManager.fini();
+
+        System.exit(0);
     }
 
     private void loadConfiguration() {
@@ -117,9 +174,14 @@ public final class Brain {
 
         try {
             var reader = new FileReader(file);
-            configuration = new Gson().fromJson(reader, Configuration.class);
+            this.configuration = new Gson().fromJson(reader, Configuration.class);
+
+            if (this.configuration == null) {
+                Brain.logger.error("Create a valid configuration file.");
+                System.exit(1);
+            }
         } catch (IOException ignored) {
-            System.out.println("Unable to read config file. Exiting.");
+            Brain.logger.error("Unable to read config file. Exiting.");
             System.exit(1);
         }
     }

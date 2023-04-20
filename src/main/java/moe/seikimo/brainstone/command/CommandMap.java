@@ -25,7 +25,7 @@ public final class CommandMap {
 
     public void executeRawCommand(String command) {
         var args = CommandMap.parseArguments(command);
-        var cmd = getCommand(args.get(0));
+        var cmd = this.getCommand(args.get(0));
         if (cmd != null) {
             cmd.execute(args.subList(1, args.size()).toArray(new String[0]));
         }
