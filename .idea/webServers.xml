@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="727d020d-2a98-4d8f-a20b-32c679a4a85f" name="Thorn Cloud">
+        <fileTransfer accessType="SFTP" host="n3.guildedthorn.com" port="2024" sshConfigId="db3a8fc4-b395-4fdc-8a27-0ecc5b186411" sshConfig="cosmic.7ab8e047@n3.guildedthorn.com:2024 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

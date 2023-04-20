@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="n3.guildedthorn.com" id="db3a8fc4-b395-4fdc-8a27-0ecc5b186411" port="2024" nameFormat="DESCRIPTIVE" username="cosmic.7ab8e047" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>
