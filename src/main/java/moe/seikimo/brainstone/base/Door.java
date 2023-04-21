@@ -67,7 +67,7 @@ public final class Door {
         var request = new Request.Builder()
                 .url(Brain.endpoint(this.info.key()))
                 .build();
-        var future = new FuturePromise<>(false);
+        var future = new FuturePromise<Boolean>();
         Callback.makeRequest(request, response -> {
             try {
                 // Check if the response is null.
@@ -110,7 +110,7 @@ public final class Door {
 
     @Override
     public String toString() {
-        return String.format("Door{id=%s, info=%s, position=%s}", id, info, position);
+        return String.format("Door{id=%s, info=%s, open=%s, position=%s}", id, info, open, position);
     }
 
     public UUID id() {

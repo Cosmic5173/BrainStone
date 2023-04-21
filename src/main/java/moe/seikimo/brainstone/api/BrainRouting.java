@@ -153,7 +153,7 @@ public interface BrainRouting {
                 return;
             }
 
-            var response = door.open().get(3, TimeUnit.SECONDS);
+            var response = door.open().get();
             ctx.status(response ? 200 : 400).result(response ?
                     "Door activated. (200)" :
                     "Door activation failed. (400)");
@@ -207,10 +207,10 @@ public interface BrainRouting {
                 return;
             }
 
-            var response = door.close().get(3, TimeUnit.SECONDS);
+            var response = door.close().get();
             ctx.status(response ? 200 : 400).result(response ?
-                    "Door activated." :
-                    "Door activation failed.");
+                    "Door activated (200)." :
+                    "Door activation failed (400).");
         } catch (Exception e) {
             ctx.status(500).result("Door activation failed. (500)");
             e.printStackTrace();

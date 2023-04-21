@@ -35,7 +35,7 @@ public record StasisChamber(
         var request = new Request.Builder()
                 .url(Brain.endpoint(this.key))
                 .build();
-        var future = new FuturePromise<>(false);
+        var future = new FuturePromise<Boolean>();
         Callback.makeRequest(request, response -> {
             try {
                 // Check if the response is null.
