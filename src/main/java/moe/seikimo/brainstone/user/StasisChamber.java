@@ -64,7 +64,7 @@ public record StasisChamber(
                     var resetRequest = new Request.Builder()
                             .url(Brain.endpoint(this.key))
                             .build();
-                    Callback.makeRequest(resetRequest, resetResponse -> {});
+                    Callback.makeRequest(resetRequest, resetResponse -> {}, 3L);
                 }
             } catch (Exception ignored) {
                 future.succeeded(false);

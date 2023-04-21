@@ -39,7 +39,7 @@ public final class Door {
             return new FuturePromise<>(true);
         } else {
             open = true;
-            return activate();
+            return activate(true);
         }
     }
 
@@ -48,15 +48,15 @@ public final class Door {
             return new FuturePromise<>(true);
         } else {
             open = false;
-            return activate();
+            return activate(false);
         }
     }
 
-    private Future<Boolean> activate() {
-        return activate(0);
+    private Future<Boolean> activate(boolean open) {
+        return activate(0, open);
     }
 
-    private Future<Boolean> activate(int calls) {
+    private Future<Boolean> activate(int calls, boolean open) {
         // Check if the method has been called too many times.
         if (calls > 4) {
             Brain.getLogger().info("Failed to activate door: {}. Too many failed attempts.", info.name());
@@ -89,18 +89,11 @@ public final class Door {
                 }
 
                 // Check if the response body is equal to "true".
-                if (!body.string().equals("true")) {
-                    future.succeeded(activate(calls + 1).get());
+                if (!body.string().equals(open ? "true" : "false")) {
+                    future.succeeded(activate(calls + 1, open).get());
                 } else {
                     future.succeeded(true);
                     Brain.getLogger().info("Successfully activated door: " + info.name());
-
-                    // Reset status of redstone block.
-                    var resetRequest = new Request.Builder()
-                            .url(Brain.endpoint(this.info.key()))
-                            .build();
-                    Callback.makeRequest(resetRequest, resetResponse -> {
-                    });
                 }
             } catch (Exception ignored) {
                 future.succeeded(false);

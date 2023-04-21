@@ -155,11 +155,29 @@ public interface BrainRouting {
 
             var response = door.open().get(3, TimeUnit.SECONDS);
             ctx.status(response ? 200 : 400).result(response ?
-                    "Door activated." :
-                    "Door activation failed.");
-        } catch (Exception ignored) {
-            ctx.status(500).result("Stasis chamber activation failed.");
+                    "Door activated. (200)" :
+                    "Door activation failed. (400)");
+        } catch (Exception e) {
+            ctx.status(500).result("Door activation failed (500).");
+            e.printStackTrace();
         }
+    }
+
+    /**
+     * Attempts to retrieve all base doors.
+     *
+     * @route GET /base/{baseId}/doors/all
+     * @param ctx The Javalin request/response context.
+     */
+    static void getAllBaseDoors(Context ctx) {
+        var baseId = UUID.fromString(ctx.pathParam("baseId"));
+        if (!BaseManager.baseExists(baseId)) {
+            ctx.status(400).result("Base does not exist.");
+            return;
+        }
+
+        var base = BaseManager.getBase(baseId);
+        ctx.status(200).json(base.getDoors().values());
     }
 
     /**
@@ -193,8 +211,9 @@ public interface BrainRouting {
             ctx.status(response ? 200 : 400).result(response ?
                     "Door activated." :
                     "Door activation failed.");
-        } catch (Exception ignored) {
-            ctx.status(500).result("Door activation failed.");
+        } catch (Exception e) {
+            ctx.status(500).result("Door activation failed. (500)");
+            e.printStackTrace();
         }
     }
 

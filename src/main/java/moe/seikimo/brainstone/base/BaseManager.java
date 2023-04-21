@@ -31,8 +31,11 @@ public final class BaseManager {
 
     public static void fini() {
         try {
-            for (var base : bases.values())
+            for (var base : bases.values()) {
+                base.getDoors().values().forEach(Door::close);
+
                 Files.writeString(new File(baseDirectory, base.getId().toString()).toPath(), base.toSave());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to save bases.", e);
         }

@@ -1,5 +1,6 @@
 package moe.seikimo.brainstone;
 
+import io.javalin.json.JavalinGson;
 import lombok.SneakyThrows;
 import moe.seikimo.brainstone.api.BrainRouting;
 import moe.seikimo.brainstone.base.BaseManager;
@@ -131,7 +132,7 @@ public final class Brain {
 
     @Getter private Configuration configuration;
 
-    @Getter private final Javalin webApp = Javalin.create();
+    @Getter private final Javalin webApp = Javalin.create(config -> config.jsonMapper(new JavalinGson(new Gson())));
     @Getter private final OkHttpClient httpClient = new OkHttpClient();
 
     @Getter private boolean running = true;
@@ -199,6 +200,7 @@ public final class Brain {
         webApp.post("/user/{userId}/stasis/{key}/create", BrainRouting::createUserStasisChamber);
         webApp.delete("/user/{userId}/stasis/{stasisId}/delete", BrainRouting::deleteUserStasisChamber);
         webApp.get("/base/{baseId}/get", BrainRouting::getBase);
+        webApp.get("/base/{baseId}/doors/all", BrainRouting::getAllBaseDoors);
         webApp.get("/base/{baseId}/doors/{doorId}/open", BrainRouting::openBaseDoor);
         webApp.get("/base/{baseId}/doors/{doorId}/close", BrainRouting::closeBaseDoor);
     }
