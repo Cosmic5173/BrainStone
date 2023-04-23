@@ -3,6 +3,7 @@ package moe.seikimo.brainstone;
 import io.javalin.json.JavalinGson;
 import lombok.SneakyThrows;
 import moe.seikimo.brainstone.api.BrainRouting;
+import moe.seikimo.brainstone.api.CreateRouting;
 import moe.seikimo.brainstone.base.BaseManager;
 import moe.seikimo.brainstone.command.CommandMap;
 import moe.seikimo.brainstone.command.defaults.*;
@@ -197,12 +198,14 @@ public final class Brain {
     private void configureApp() {
         webApp.get("/user/{userId}/get", BrainRouting::getUser);
         webApp.get("/user/{userId}/stasis/{stasisId}/activate", BrainRouting::activateUserStasisChamber);
-        webApp.post("/user/{userId}/stasis/{key}/create", BrainRouting::createUserStasisChamber);
+        webApp.post("/user/{userId}/stasis/{stasisId}/create", CreateRouting::createUserStasisChamber);
         webApp.delete("/user/{userId}/stasis/{stasisId}/delete", BrainRouting::deleteUserStasisChamber);
+
         webApp.get("/base/{baseId}/get", BrainRouting::getBase);
         webApp.get("/base/{baseId}/doors/all", BrainRouting::getAllBaseDoors);
         webApp.get("/base/{baseId}/doors/{doorId}/open", BrainRouting::openBaseDoor);
         webApp.get("/base/{baseId}/doors/{doorId}/close", BrainRouting::closeBaseDoor);
+        webApp.post("/base/{baseId}/doors/create", CreateRouting::createBaseDoor);
     }
 
     private void loadData() {

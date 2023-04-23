@@ -1,7 +1,6 @@
 package moe.seikimo.brainstone.api;
 
 import moe.seikimo.brainstone.base.BaseManager;
-import moe.seikimo.brainstone.user.StasisChamber;
 import moe.seikimo.brainstone.user.UserManager;
 import io.javalin.http.Context;
 
@@ -48,27 +47,6 @@ public interface BrainRouting {
         } catch (Exception ignored) {
             ctx.status(500).result("Stasis chamber activation failed.");
         }
-    }
-
-    /**
-     * Attempts to create a new stasis chamber.
-     *
-     * @route POST /user/{userId}/stasis/{stasisId}/create
-     * @param ctx The Javalin request/response context.
-     */
-    static void createUserStasisChamber(Context ctx) {
-        var userId = UUID.fromString(ctx.pathParam("userId"));
-        var stasisKey = UUID.fromString(ctx.pathParam("key"));
-        if (!UserManager.userExists(userId)) {
-            ctx.status(404).result("User does not exist.");
-            return;
-        }
-
-        var user = UserManager.getUser(userId);
-        var stasisChamber = new StasisChamber(user, UUID.randomUUID(), stasisKey);
-        user.addStasisChamber(stasisChamber);
-
-        ctx.status(200).result(stasisKey.toString());
     }
 
     /**

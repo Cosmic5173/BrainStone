@@ -1,6 +1,7 @@
 package moe.seikimo.brainstone.base;
 
 import moe.seikimo.brainstone.Brain;
+import moe.seikimo.brainstone.api.body.CreateDoorRequest;
 import moe.seikimo.brainstone.util.Callback;
 import okhttp3.Request;
 import org.eclipse.jetty.util.FuturePromise;
@@ -10,6 +11,45 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public final class Door {
+    /**
+     * Creates a new door from a request.
+     *
+     * @param request The request.
+     * @return The new door instance.
+     */
+    public static Door of(CreateDoorRequest request) {
+        return Door.of(
+                request.getName(), request.getDescription(),
+                UUID.fromString(request.getKey()),
+                request.getPosition().dimension(),
+                request.getPosition().x(),
+                request.getPosition().y(),
+                request.getPosition().z()
+        );
+    }
+
+    /**
+     * Creates a new door.
+     *
+     * @param name The name of the door.
+     * @param description The description of the door.
+     * @param key The Wireless Redstone endpoint UUID.
+     * @param dimension The dimension of the door. Format: 'minecraft:{dimension}'
+     * @param x The X coordinate of the door.
+     * @param y The Y coordinate of the door.
+     * @param z The Z coordinate of the door.
+     * @return The new door instance.
+     */
+    public static Door of(
+            String name, String description, UUID key,
+            String dimension, float x, float y, float z
+    ) {
+        var id = UUID.randomUUID();
+        var info = new DoorInfo(name, description, key);
+        var position = new DoorPosition(dimension, x, y, z);
+        return new Door(id, info, position);
+    }
+
     private final UUID id;
     private final DoorInfo info;
     private final DoorPosition position;
@@ -126,7 +166,6 @@ public final class Door {
     }
 
     public record DoorInfo(String name, String description, UUID key) {
-
         @Override
         public String toString() {
             return String.format("DoorInfo{name=%s, description=%s, key=%s}", name, description, key);
@@ -134,7 +173,6 @@ public final class Door {
     }
 
     public record DoorPosition(String dimension, float x, float y, float z) {
-
         @Override
         public String toString() {
             return String.format("DoorPosition{dimension=%s, x=%s, y=%s, z=%s}", dimension, x, y, z);
